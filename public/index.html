@@ -13,10 +13,6 @@
         <h1>Generals Online</h1>
         <p>Play turn-based army strategy with a friend.</p>
       </div>
-      <div class="legend-panel">
-        <h2>Legend</h2>
-        <div class="legend-grid" id="legendGrid"></div>
-      </div>
     </header>
 
     <section class="lobby">
@@ -29,17 +25,19 @@
     </section>
 
     <section class="game-area hidden">
+      <aside class="sidebar-left">
+        <div id="pieceTray" class="piece-tray"></div>
+      </aside>
       <div class="board-wrapper">
         <div class="board-meta">
           <div id="setupControls" class="setup-controls hidden">
             <p>Setup phase: place your units on your first 3 rows.</p>
             <button id="startGameBtn" disabled>Ready to start</button>
           </div>
-          <div id="pieceTray" class="piece-tray"></div>
           <div id="board" class="board"></div>
         </div>
       </div>
-      <aside class="sidebar">
+      <aside class="sidebar-right">
         <div class="info-box">
           <h2>Game Info</h2>
           <p id="playerColor"></p>
@@ -47,6 +45,36 @@
           <p id="gameResult"></p>
           <p id="setupStatus"></p>
           <p id="moveIndicator" class="move-indicator"></p>
+        </div>
+        <div id="battleRules" class="battle-rules hidden">
+          <h2>Battle Rules</h2>
+          <div class="battle-grid">
+            <div class="battle-row">
+              <span class="battle-attacker">5★</span>
+              <span class="battle-verb">beats</span>
+              <span class="battle-defender">4★, 3★, 2★, 1★, COL, LtC, Maj, Capt, 1Lt, 2Lt, Sgt, Pvt</span>
+            </div>
+            <div class="battle-row">
+              <span class="battle-attacker">4★</span>
+              <span class="battle-verb">beats</span>
+              <span class="battle-defender">3★, 2★, 1★, COL, LtC, Maj, Capt, 1Lt, 2Lt, Sgt, Pvt</span>
+            </div>
+            <div class="battle-row">
+              <span class="battle-attacker">Spy</span>
+              <span class="battle-verb">beats</span>
+              <span class="battle-defender">Officers, Flag</span>
+            </div>
+            <div class="battle-row">
+              <span class="battle-attacker">Pvt</span>
+              <span class="battle-verb">beats</span>
+              <span class="battle-defender">Spy, Flag</span>
+            </div>
+            <div class="battle-row">
+              <span class="battle-attacker">Same rank</span>
+              <span class="battle-verb">→</span>
+              <span class="battle-defender">Both eliminated</span>
+            </div>
+          </div>
         </div>
       </aside>
     </section>

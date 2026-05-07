@@ -13,10 +13,10 @@ const turnInfoEl = document.getElementById('turnInfo');
 const gameResultEl = document.getElementById('gameResult');
 const moveIndicatorEl = document.getElementById('moveIndicator');
 const setupStatusEl = document.getElementById('setupStatus');
+const battleRulesEl = document.getElementById('battleRules');
 const gameAreaEl = document.querySelector('.game-area');
 const joinBtn = document.getElementById('joinBtn');
 const roomIdInput = document.getElementById('roomId');
-const legendGrid = document.getElementById('legendGrid');
 const startGameBtn = document.getElementById('startGameBtn');
 const setupControls = document.getElementById('setupControls');
 
@@ -61,17 +61,6 @@ const UNIT_LABELS = {
   unknown: 'Unknown'
 };
 
-function renderLegend() {
-  legendGrid.innerHTML = '';
-  Object.keys(UNIT_ICON).forEach((key) => {
-    if (key === 'unknown') return;
-    const item = document.createElement('div');
-    item.className = 'legend-item';
-    item.innerHTML = `<span class="legend-icon">${UNIT_ICON[key]}</span><span class="legend-name">${UNIT_LABELS[key]}</span>`;
-    legendGrid.appendChild(item);
-  });
-}
-
 function renderPieceTray(state) {
   pieceTrayEl.innerHTML = '';
   if (state.phase !== 'setup') {
@@ -107,8 +96,6 @@ function renderPieceTray(state) {
     pieceTrayEl.appendChild(card);
   });
 }
-
-renderLegend();
 
 joinBtn.addEventListener('click', () => {
   const roomId = roomIdInput.value.trim();
@@ -195,6 +182,8 @@ function updateInfo(state) {
 
   if (state.phase === 'setup') {
     setupControls.classList.remove('hidden');
+    battleRulesEl.classList.add('hidden');
+    pieceTrayEl.classList.remove('hidden');
     const unplacedCount = state.units.filter((unit) => unit.color === localColor && !unit.pos).length;
     const myReady = state.setupReady ? state.setupReady[localColor] : false;
     startGameBtn.disabled = myReady || unplacedCount > 0;
@@ -208,6 +197,7 @@ function updateInfo(state) {
     setupControls.classList.add('hidden');
     setupStatusEl.textContent = '';
     pieceTrayEl.classList.add('hidden');
+    battleRulesEl.classList.remove('hidden');
     selectedPieceId = null;
   }
 
