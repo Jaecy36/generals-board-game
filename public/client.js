@@ -23,21 +23,21 @@ const HIDDEN_ICON = '?';
 const HIDDEN_LABEL = '?';
 
 const UNIT_IMAGES = {
-  general5: 'images/general5.png',
-  general4: 'images/general4.png',
-  general3: 'images/general3.png',
-  general2: 'images/general2.png',
-  general1: 'images/general1.png',
-  colonel: 'images/colonel.png',
-  lt_colonel: 'images/lt_colonel.png',
-  major: 'images/major.png',
-  captain: 'images/captain.png',
-  lieutenant1: 'images/lieutenant1.png',
-  lieutenant2: 'images/lieutenant2.png',
-  sergeant: 'images/sergeant.png',
-  private: 'images/private.png',
-  spy: 'images/spy.png',
-  flag: 'images/flag.png'
+  general5: 'images/G5.svg',
+  general4: 'images/G4.svg',
+  general3: 'images/G3.svg',
+  general2: 'images/G2.svg',
+  general1: 'images/G1.svg',
+  colonel: 'images/CL.svg',
+  lt_colonel: 'images/LtCol.svg',
+  major: 'images/Major.svg',
+  captain: 'images/CAPT.svg',
+  lieutenant1: 'images/1LT.svg',
+  lieutenant2: 'images/2LT.svg',
+  sergeant: 'images/SGT.svg',
+  private: 'images/PRVT.svg',
+  spy: 'images/SPY.svg',
+  flag: 'images/FLAG.svg'
 };
 
 const UNIT_LABELS = {
