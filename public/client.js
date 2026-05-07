@@ -12,6 +12,7 @@ const playerColorEl = document.getElementById('playerColor');
 const turnInfoEl = document.getElementById('turnInfo');
 const gameResultEl = document.getElementById('gameResult');
 const moveIndicatorEl = document.getElementById('moveIndicator');
+const turnToastEl = document.getElementById('turnToast');
 const setupStatusEl = document.getElementById('setupStatus');
 const gameAreaEl = document.querySelector('.game-area');
 const joinBtn = document.getElementById('joinBtn');
@@ -23,21 +24,21 @@ const HIDDEN_ICON = '?';
 const HIDDEN_LABEL = '?';
 
 const UNIT_IMAGES = {
-  general5: 'images/G5.png',
-  general4: 'images/G4.png',
-  general3: 'images/G3.png',
-  general2: 'images/G2.png',
-  general1: 'images/G1.png',
-  colonel: 'images/CL.png',
-  lt_colonel: 'images/LtCol.png',
-  major: 'images/Major.png',
-  captain: 'images/CAPT.png',
-  lieutenant1: 'images/1LT.png',
-  lieutenant2: 'images/2LT.png',
-  sergeant: 'images/SGT.png',
-  private: 'images/PRVT.png',
-  spy: 'images/SPY.png',
-  flag: 'images/FLAG.png'
+  general5: 'images/G5.svg',
+  general4: 'images/G4.svg',
+  general3: 'images/G3.svg',
+  general2: 'images/G2.svg',
+  general1: 'images/G1.svg',
+  colonel: 'images/CL.svg',
+  lt_colonel: 'images/LtCol.svg',
+  major: 'images/Major.svg',
+  captain: 'images/CAPT.svg',
+  lieutenant1: 'images/1LT.svg',
+  lieutenant2: 'images/2LT.svg',
+  sergeant: 'images/SGT.svg',
+  private: 'images/PRVT.svg',
+  spy: 'images/SPY.svg',
+  flag: 'images/FLAG.svg'
 };
 
 const UNIT_LABELS = {
@@ -123,10 +124,11 @@ socket.on('joined', ({ roomId, color }) => {
 });
 
 socket.on('stateUpdate', (state) => {
+  const previousState = currentState;
   currentState = state;
   renderBoard(state);
   renderPieceTray(state);
-  updateInfo(state);
+  updateInfo(state, previousState);
 });
 
 socket.on('errorMessage', (message) => {
@@ -159,7 +161,7 @@ function renderBoard(state) {
       if (unit) {
         const title = unit.hidden ? HIDDEN_LABEL : UNIT_LABELS[unit.type];
         if (unit.hidden) {
-          cell.innerHTML = `<div class="hidden-enemy" title="${title}"></div>`;
+          cell.innerHTML = `<div class="unit enemy" title="${title}"><span class="label">${HIDDEN_LABEL}</span></div>`;
         } else {
           const src = UNIT_IMAGES[unit.type] || '';
           cell.innerHTML = `
@@ -184,10 +186,26 @@ function renderBoard(state) {
   }
 }
 
-function updateInfo(state) {
+let turnToastTimeout = null;
+
+function showTurnToast(message) {
+  if (!turnToastEl) return;
+  turnToastEl.textContent = message;
+  turnToastEl.classList.add('visible');
+  clearTimeout(turnToastTimeout);
+  turnToastTimeout = setTimeout(() => {
+    turnToastEl.classList.remove('visible');
+  }, 1700);
+}
+
+function updateInfo(state, previousState) {
   const phaseText = state.phase === 'setup' ? 'Setup phase' : 'Playing phase';
   turnInfoEl.textContent = state.phase === 'setup' ? `${phaseText}` : `Turn: ${state.turn.toUpperCase()}`;
   gameResultEl.textContent = state.winner ? `Winner: ${state.winner.toUpperCase()}` : '';
+
+  if (previousState && state.phase === 'playing' && previousState.turn !== state.turn && state.turn === localColor) {
+    showTurnToast("It's your turn");
+  }
 
   if (state.phase === 'setup') {
     setupControls.classList.remove('hidden');
