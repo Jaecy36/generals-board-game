@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Generals Online</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <header>
+      <h1>Generals Online</h1>
+      <p>Play turn-based army strategy with a friend.</p>
+    </header>
+
+    <section class="lobby">
+      <div>
+        <label for="roomId">Room name</label>
+        <input id="roomId" type="text" placeholder="Enter room code" />
+        <button id="joinBtn">Join / Create room</button>
+      </div>
+      <div id="status" class="status">Not connected.</div>
+    </section>
+
+    <section class="game-area hidden">
+      <div class="board-wrapper">
+        <div id="board" class="board"></div>
+      </div>
+      <aside class="sidebar">
+        <div class="info-box">
+          <h2>Game Info</h2>
+          <p id="playerColor"></p>
+          <p id="turnInfo"></p>
+          <p id="gameResult"></p>
+        </div>
+        <div class="log-box">
+          <h2>Action Log</h2>
+          <ul id="logList"></ul>
+        </div>
+      </aside>
+    </section>
+  </div>
+
+  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+  <script src="client.js"></script>
+</body>
+</html>
