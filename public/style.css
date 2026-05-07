@@ -18,7 +18,7 @@ body {
 
 .app-shell {
   padding: clamp(20px, 4vw, 32px);
-  max-width: 1280px;
+  max-width: 12800px;
   margin: 0 auto;
 }
 
