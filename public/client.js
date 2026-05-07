@@ -10,13 +10,15 @@ const playerColorEl = document.getElementById('playerColor');
 const turnInfoEl = document.getElementById('turnInfo');
 const gameResultEl = document.getElementById('gameResult');
 const setupStatusEl = document.getElementById('setupStatus');
-const logListEl = document.getElementById('logList');
 const gameAreaEl = document.querySelector('.game-area');
 const joinBtn = document.getElementById('joinBtn');
 const roomIdInput = document.getElementById('roomId');
 const legendGrid = document.getElementById('legendGrid');
 const startGameBtn = document.getElementById('startGameBtn');
 const setupControls = document.getElementById('setupControls');
+
+const HIDDEN_ICON = '❓';
+const HIDDEN_LABEL = 'Enemy';
 
 const UNIT_ICON = {
   general5: '5★',
@@ -33,7 +35,8 @@ const UNIT_ICON = {
   sergeant: 'Sgt',
   private: 'Pvt',
   spy: 'Spy',
-  flag: '⚑'
+  flag: '⚑',
+  unknown: HIDDEN_ICON
 };
 
 const UNIT_LABELS = {
@@ -99,18 +102,30 @@ socket.on('errorMessage', (message) => {
   statusEl.textContent = message;
 });
 
+function mapDisplayRow(row) {
+  return localColor === 'blue' ? 7 - row : row;
+}
+
+function mapActualRow(row) {
+  return localColor === 'blue' ? 7 - row : row;
+}
+
 function renderBoard(state) {
   boardEl.innerHTML = '';
   for (let row = 0; row < 8; row++) {
     for (let col = 0; col < 8; col++) {
+      const actualRow = mapActualRow(row);
       const cell = document.createElement('button');
       const isLight = (row + col) % 2 === 0;
       cell.className = `cell ${isLight ? 'light' : 'dark'}`;
-      cell.dataset.row = row;
+      cell.dataset.row = actualRow;
       cell.dataset.col = col;
-      const unit = state.units.find((u) => u.pos[0] === row && u.pos[1] === col);
+      const unit = state.units.find((u) => u.pos[0] === actualRow && u.pos[1] === col);
       if (unit) {
-        const unitHtml = `<div class="unit ${unit.color}" title="${UNIT_LABELS[unit.type]}"><span class="icon">${UNIT_ICON[unit.type]}</span><span class="label">${UNIT_ICON[unit.type]}</span></div>`;
+        const icon = unit.hidden ? HIDDEN_ICON : UNIT_ICON[unit.type];
+        const label = unit.hidden ? HIDDEN_LABEL : UNIT_ICON[unit.type];
+        const title = unit.hidden ? HIDDEN_LABEL : UNIT_LABELS[unit.type];
+        const unitHtml = `<div class="unit ${unit.hidden ? 'enemy' : unit.color}" title="${title}"><span class="icon">${icon}</span><span class="label">${label}</span></div>`;
         cell.innerHTML = unitHtml;
       }
       cell.addEventListener('click', onCellClick);
@@ -143,12 +158,6 @@ function updateInfo(state) {
     setupStatusEl.textContent = '';
   }
 
-  logListEl.innerHTML = '';
-  state.log.slice(0, 8).forEach((entry) => {
-    const li = document.createElement('li');
-    li.textContent = entry;
-    logListEl.appendChild(li);
-  });
 }
 
 function onCellClick(event) {
