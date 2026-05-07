@@ -80,6 +80,11 @@ function renderPieceTray(state) {
   }
 
   pieceTrayEl.classList.remove('hidden');
+  const header = document.createElement('div');
+  header.className = 'piece-tray-header';
+  header.textContent = 'Available setup pieces';
+  pieceTrayEl.appendChild(header);
+
   const unplaced = state.units.filter((unit) => unit.color === localColor && !unit.pos);
   if (unplaced.length === 0) {
     pieceTrayEl.innerHTML = '<div class="piece-tray-empty">All pieces placed. Click Ready when you are finished.</div>';
@@ -161,7 +166,7 @@ function renderBoard(state) {
       cell.className = `cell ${isLight ? 'light' : 'dark'}`;
       cell.dataset.row = actualRow;
       cell.dataset.col = col;
-      const unit = state.units.find((u) => u.pos[0] === actualRow && u.pos[1] === col);
+      const unit = state.units.find((u) => u.pos && u.pos[0] === actualRow && u.pos[1] === col);
       if (unit) {
         const icon = unit.hidden ? HIDDEN_ICON : UNIT_ICON[unit.type];
         const label = unit.hidden ? HIDDEN_LABEL : UNIT_ICON[unit.type];
@@ -214,7 +219,7 @@ function onCellClick(event) {
   const row = Number(event.currentTarget.dataset.row);
   const col = Number(event.currentTarget.dataset.col);
   const clicked = [row, col];
-  const unit = currentState.units.find((u) => u.pos[0] === row && u.pos[1] === col);
+  const unit = currentState.units.find((u) => u.pos && u.pos[0] === row && u.pos[1] === col);
 
   if (currentState.phase === 'setup' && selectedPieceId && !unit && isInSetupZone(localColor, row)) {
     socket.emit('placePiece', { roomId: currentRoom, pieceId: selectedPieceId, to: clicked });

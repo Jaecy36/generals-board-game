@@ -150,7 +150,23 @@ header p {
 
 .board-meta {
   display: grid;
-  gap: 14px;
+  grid-template-columns: minmax(0, 1.5fr) minmax(220px, 280px);
+  gap: 18px;
+  align-items: start;
+}
+
+.piece-tray-header {
+  font-size: 0.98rem;
+  font-weight: 700;
+  color: #e2e8f0;
+  margin-bottom: 10px;
+}
+
+.piece-tray {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 10px;
+  margin-top: 0;
 }
 
 .setup-controls {
