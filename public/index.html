@@ -9,8 +9,14 @@
 <body>
   <div class="app-shell">
     <header>
-      <h1>Generals Online</h1>
-      <p>Play turn-based army strategy with a friend.</p>
+      <div>
+        <h1>Generals Online</h1>
+        <p>Play turn-based army strategy with a friend.</p>
+      </div>
+      <div class="legend-panel">
+        <h2>Legend</h2>
+        <div class="legend-grid" id="legendGrid"></div>
+      </div>
     </header>
 
     <section class="lobby">
@@ -24,7 +30,13 @@
 
     <section class="game-area hidden">
       <div class="board-wrapper">
-        <div id="board" class="board"></div>
+        <div class="board-meta">
+          <div id="setupControls" class="setup-controls hidden">
+            <p>Setup phase: place your units on your first 3 rows.</p>
+            <button id="startGameBtn" disabled>Ready to start</button>
+          </div>
+          <div id="board" class="board"></div>
+        </div>
       </div>
       <aside class="sidebar">
         <div class="info-box">
@@ -32,6 +44,7 @@
           <p id="playerColor"></p>
           <p id="turnInfo"></p>
           <p id="gameResult"></p>
+          <p id="setupStatus"></p>
         </div>
         <div class="log-box">
           <h2>Action Log</h2>
