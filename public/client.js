@@ -1,14 +1,17 @@
 const socket = io();
 let selectedCell = null;
+let selectedPieceId = null;
 let localColor = null;
 let currentState = null;
 let currentRoom = null;
 
 const boardEl = document.getElementById('board');
+const pieceTrayEl = document.getElementById('pieceTray');
 const statusEl = document.getElementById('status');
 const playerColorEl = document.getElementById('playerColor');
 const turnInfoEl = document.getElementById('turnInfo');
 const gameResultEl = document.getElementById('gameResult');
+const moveIndicatorEl = document.getElementById('moveIndicator');
 const setupStatusEl = document.getElementById('setupStatus');
 const gameAreaEl = document.querySelector('.game-area');
 const joinBtn = document.getElementById('joinBtn');
@@ -54,16 +57,49 @@ const UNIT_LABELS = {
   sergeant: 'Sergeant',
   private: 'Private',
   spy: 'Spy',
-  flag: 'Flag'
+  flag: 'Flag',
+  unknown: 'Unknown'
 };
 
 function renderLegend() {
   legendGrid.innerHTML = '';
   Object.keys(UNIT_ICON).forEach((key) => {
+    if (key === 'unknown') return;
     const item = document.createElement('div');
     item.className = 'legend-item';
     item.innerHTML = `<span class="legend-icon">${UNIT_ICON[key]}</span><span class="legend-name">${UNIT_LABELS[key]}</span>`;
     legendGrid.appendChild(item);
+  });
+}
+
+function renderPieceTray(state) {
+  pieceTrayEl.innerHTML = '';
+  if (state.phase !== 'setup') {
+    pieceTrayEl.classList.add('hidden');
+    return;
+  }
+
+  pieceTrayEl.classList.remove('hidden');
+  const unplaced = state.units.filter((unit) => unit.color === localColor && !unit.pos);
+  if (unplaced.length === 0) {
+    pieceTrayEl.innerHTML = '<div class="piece-tray-empty">All pieces placed. Click Ready when you are finished.</div>';
+    return;
+  }
+
+  unplaced.forEach((unit) => {
+    const card = document.createElement('button');
+    card.type = 'button';
+    card.className = `piece-card piece-${unit.type}`;
+    if (selectedPieceId === unit.id) card.classList.add('selected');
+    card.dataset.pieceId = unit.id;
+    card.innerHTML = `<span class="piece-icon">${UNIT_ICON[unit.type]}</span><span class="piece-label">${UNIT_LABELS[unit.type]}</span>`;
+    card.addEventListener('click', () => {
+      selectedPieceId = unit.id;
+      selectedCell = null;
+      renderPieceTray(state);
+      renderBoard(state);
+    });
+    pieceTrayEl.appendChild(card);
   });
 }
 
@@ -95,6 +131,7 @@ socket.on('joined', ({ roomId, color }) => {
 socket.on('stateUpdate', (state) => {
   currentState = state;
   renderBoard(state);
+  renderPieceTray(state);
   updateInfo(state);
 });
 
@@ -108,6 +145,10 @@ function mapDisplayRow(row) {
 
 function mapActualRow(row) {
   return localColor === 'blue' ? 7 - row : row;
+}
+
+function isInSetupZone(color, row) {
+  return color === 'blue' ? row <= 2 : row >= 5;
 }
 
 function renderBoard(state) {
@@ -137,6 +178,8 @@ function renderBoard(state) {
     const selectedButton = boardEl.querySelector(`.cell[data-row="${selectedCell[0]}"][data-col="${selectedCell[1]}"]`);
     if (selectedButton) selectedButton.classList.add('selected');
     markTargets(selectedCell);
+  } else if (selectedPieceId) {
+    markTargets(null);
   }
 }
 
@@ -147,15 +190,20 @@ function updateInfo(state) {
 
   if (state.phase === 'setup') {
     setupControls.classList.remove('hidden');
+    const unplacedCount = state.units.filter((unit) => unit.color === localColor && !unit.pos).length;
     const myReady = state.setupReady ? state.setupReady[localColor] : false;
-    startGameBtn.disabled = myReady;
+    startGameBtn.disabled = myReady || unplacedCount > 0;
     startGameBtn.textContent = myReady ? 'Ready' : 'Ready to start';
     const readyFor = state.setupReady ? state.setupReady : { blue: false, red: false };
-    setupStatusEl.textContent = `Ready: Blue ${readyFor.blue ? '✓' : '✗'}, Red ${readyFor.red ? '✓' : '✗'}`;
+    setupStatusEl.textContent = unplacedCount > 0
+      ? `Place ${unplacedCount} remaining pieces before readying.`
+      : `Ready: Blue ${readyFor.blue ? '✓' : '✗'}, Red ${readyFor.red ? '✓' : '✗'}`;
     statusEl.textContent = myReady ? 'Waiting for the opponent to finish setup.' : 'Arrange your pieces on your setup rows and click Ready.';
   } else {
     setupControls.classList.add('hidden');
     setupStatusEl.textContent = '';
+    pieceTrayEl.classList.add('hidden');
+    selectedPieceId = null;
   }
 
 }
@@ -168,8 +216,16 @@ function onCellClick(event) {
   const clicked = [row, col];
   const unit = currentState.units.find((u) => u.pos[0] === row && u.pos[1] === col);
 
+  if (currentState.phase === 'setup' && selectedPieceId && !unit && isInSetupZone(localColor, row)) {
+    socket.emit('placePiece', { roomId: currentRoom, pieceId: selectedPieceId, to: clicked });
+    selectedPieceId = null;
+    selectedCell = null;
+    return;
+  }
+
   if (unit && unit.color === localColor) {
     selectedCell = clicked;
+    selectedPieceId = null;
     renderBoard(currentState);
     return;
   }
@@ -180,22 +236,26 @@ function onCellClick(event) {
 }
 
 function markTargets(from) {
-  const source = currentState.units.find((u) => u.pos[0] === from[0] && u.pos[1] === from[1]);
-  if (!source) return;
-
   for (let row = 0; row < 8; row++) {
     for (let col = 0; col < 8; col++) {
-      const distance = Math.abs(row - from[0]) + Math.abs(col - from[1]);
       const target = boardEl.querySelector(`.cell[data-row="${row}"][data-col="${col}"]`);
       if (!target) continue;
+      target.classList.remove('attackable', 'placeable');
+      const occupied = currentState.units.some((u) => u.pos && u.pos[0] === row && u.pos[1] === col);
+      const isSetupZone = isInSetupZone(localColor, row);
+
       if (currentState.phase === 'setup') {
-        const isOwnZone = source.color === 'blue' ? row <= 2 : row >= 5;
-        const occupied = currentState.units.some((u) => u.pos[0] === row && u.pos[1] === col);
-        if (isOwnZone && !occupied) {
-          target.classList.add('attackable');
+        if (selectedPieceId && !occupied && isSetupZone) {
+          target.classList.add('placeable');
+        }
+        if (from) {
+          const source = currentState.units.find((u) => u.pos && u.pos[0] === from[0] && u.pos[1] === from[1]);
+          if (source && source.color === localColor && Math.abs(row - from[0]) + Math.abs(col - from[1]) === 1 && !occupied && isSetupZone) {
+            target.classList.add('attackable');
+          }
         }
       } else {
-        if (distance === 1) {
+        if (from && Math.abs(row - from[0]) + Math.abs(col - from[1]) === 1) {
           target.classList.add('attackable');
         }
       }

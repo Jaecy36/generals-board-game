@@ -35,62 +35,20 @@ const PIECE_INFO = {
   flag: { label: 'Flag', rank: -1, icon: '⚑' }
 };
 const BOARD_SIZE = 8;
-const START_POSITIONS = {
-  blue: [
-    { type: 'colonel', pos: [0, 0] },
-    { type: 'general5', pos: [0, 1] },
-    { type: 'general4', pos: [0, 2] },
-    { type: 'general3', pos: [0, 3] },
-    { type: 'general2', pos: [0, 4] },
-    { type: 'general1', pos: [0, 5] },
-    { type: 'lt_colonel', pos: [0, 6] },
-    { type: 'major', pos: [0, 7] },
-    { type: 'captain', pos: [1, 0] },
-    { type: 'lieutenant1', pos: [1, 1] },
-    { type: 'lieutenant2', pos: [1, 2] },
-    { type: 'sergeant', pos: [1, 3] },
-    { type: 'spy', pos: [1, 4] },
-    { type: 'spy', pos: [1, 5] },
-    { type: 'private', pos: [1, 6] },
-    { type: 'private', pos: [2, 0] },
-    { type: 'private', pos: [2, 1] },
-    { type: 'private', pos: [2, 2] },
-    { type: 'private', pos: [2, 3] },
-    { type: 'private', pos: [2, 4] },
-    { type: 'flag', pos: [2, 5] }
-  ],
-  red: [
-    { type: 'major', pos: [7, 0] },
-    { type: 'lt_colonel', pos: [7, 1] },
-    { type: 'general1', pos: [7, 2] },
-    { type: 'general2', pos: [7, 3] },
-    { type: 'general3', pos: [7, 4] },
-    { type: 'general4', pos: [7, 5] },
-    { type: 'general5', pos: [7, 6] },
-    { type: 'colonel', pos: [7, 7] },
-    { type: 'private', pos: [6, 0] },
-    { type: 'private', pos: [6, 1] },
-    { type: 'private', pos: [6, 2] },
-    { type: 'private', pos: [6, 3] },
-    { type: 'private', pos: [6, 4] },
-    { type: 'spy', pos: [6, 5] },
-    { type: 'spy', pos: [6, 6] },
-    { type: 'sergeant', pos: [5, 0] },
-    { type: 'lieutenant2', pos: [5, 1] },
-    { type: 'lieutenant1', pos: [5, 2] },
-    { type: 'captain', pos: [5, 3] },
-    { type: 'flag', pos: [5, 4] },
-    { type: 'private', pos: [5, 5] }
-  ]
-};
+const PIECE_ORDER = [
+  'general5', 'general4', 'general3', 'general2', 'general1',
+  'colonel', 'lt_colonel', 'major', 'captain', 'lieutenant1',
+  'lieutenant2', 'sergeant', 'spy', 'spy', 'private', 'private',
+  'private', 'private', 'private', 'private', 'flag'
+];
 
 app.use(express.static('public'));
 
 function createGameState(roomId) {
   const units = [];
-  for (const color of Object.keys(START_POSITIONS)) {
-    START_POSITIONS[color].forEach(({ type, pos }) => {
-      units.push({ id: uuidv4(), type, color, pos });
+  for (const color of Object.keys(SETUP_ROWS)) {
+    PIECE_ORDER.forEach((type) => {
+      units.push({ id: uuidv4(), type, color, pos: null });
     });
   }
   return {
@@ -101,13 +59,14 @@ function createGameState(roomId) {
     winner: null,
     pendingFlagWin: null,
     pendingFlagTurn: null,
+    lastMove: null,
     units,
     log: ['Game created. Blue moves first. Set up your pieces on your first three rows.']
   };
 }
 
 function getUnitAt(state, x, y) {
-  return state.units.find((unit) => unit.pos[0] === x && unit.pos[1] === y);
+  return state.units.find((unit) => unit.pos && unit.pos[0] === x && unit.pos[1] === y);
 }
 
 function isInBounds(x, y) {
@@ -296,6 +255,7 @@ io.on('connection', (socket) => {
       room.state.turn = TURN_ORDER[(TURN_ORDER.indexOf(room.state.turn) + 1) % TURN_ORDER.length];
     }
 
+    room.state.lastMove = { text: actionText, player: player.color };
     room.state.log.unshift(actionText);
     if (room.state.phase === 'playing') {
       const winner = checkWinner(room.state);
@@ -308,13 +268,50 @@ io.on('connection', (socket) => {
     emitRoomState(roomId);
   });
 
+  socket.on('placePiece', ({ roomId, pieceId, to }) => {
+    const room = ROOMS[roomId];
+    if (!room) return;
+    if (room.state.winner) return;
+    if (room.state.phase !== 'setup') return;
+
+    const player = room.players.find((player) => player.id === socket.id);
+    if (!player) return;
+
+    const piece = room.state.units.find((unit) => unit.id === pieceId);
+    if (!piece || piece.color !== player.color || piece.pos) {
+      socket.emit('errorMessage', 'Invalid piece selection.');
+      return;
+    }
+    const [x, y] = to;
+    if (!isInBounds(x, y) || !isInSetupZone(player.color, x, y) || getUnitAt(room.state, x, y)) {
+      socket.emit('errorMessage', 'Invalid placement.');
+      return;
+    }
+
+    piece.pos = [x, y];
+    room.state.setupReady[player.color] = false;
+    const actionText = `${player.color} placed ${PIECE_INFO[piece.type].label} at ${to}.`;
+    room.state.lastMove = { text: actionText, player: player.color };
+    room.state.log.unshift(actionText);
+    emitRoomState(roomId);
+  });
+
   socket.on('readyUp', (roomId) => {
     const room = ROOMS[roomId];
     if (!room) return;
     const player = room.players.find((player) => player.id === socket.id);
     if (!player) return;
+
+    const unplaced = room.state.units.filter((unit) => unit.color === player.color && !unit.pos).length;
+    if (unplaced > 0) {
+      socket.emit('errorMessage', `Place all ${unplaced} remaining pieces before readying.`);
+      return;
+    }
+
     room.state.setupReady[player.color] = true;
-    room.state.log.unshift(`${player.color} is ready to begin.`);
+    const actionText = `${player.color} is ready to begin.`;
+    room.state.lastMove = { text: actionText, player: player.color };
+    room.state.log.unshift(actionText);
     if (room.players.length === MAX_PLAYERS && room.state.setupReady.blue && room.state.setupReady.red) {
       room.state.phase = 'playing';
       room.state.turn = 'blue';
