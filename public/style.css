@@ -229,52 +229,46 @@ header p {
   overflow-y: auto;
 }
 
-.battle-rules {
-  display: grid;
-  gap: 14px;
-  padding: 18px;
+.image-panel {
   background: rgba(20, 28, 40, 0.95);
   border: 1px solid rgba(148, 163, 184, 0.14);
   border-radius: 18px;
+  overflow: hidden;
 }
 
-.battle-rules h2 {
-  margin: 0;
-  font-size: 1.05rem;
-}
-
-.battle-grid {
-  display: grid;
-  gap: 10px;
-}
-
-.battle-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  align-items: center;
-  padding: 10px 12px;
-  background: rgba(255, 255, 255, 0.04);
-  border-radius: 14px;
-}
-
-.battle-attacker {
-  font-weight: 700;
-  color: #a5f3fc;
-}
-
-.battle-verb {
-  color: #f8fafc;
-}
-
-.battle-defender {
-  color: #e2e8f0;
+.banner-image {
+  width: 100%;
+  height: auto;
+  display: block;
 }
 
 .piece-tray-header {
   font-weight: 700;
   margin-bottom: 10px;
   color: #e2e8f0;
+}
+
+.piece-image,
+.unit-image {
+  width: 42px;
+  height: 42px;
+  object-fit: contain;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.unit {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.unit .label {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
 }
 
 .piece-card {
@@ -295,32 +289,9 @@ header p {
   background: rgba(79, 140, 255, 0.12);
 }
 
-.piece-icon {
-  font-weight: 700;
-}
-
 .piece-label {
   font-size: 0.8rem;
   color: #dbeafe;
-}
-
-/* UNIT DISPLAY */
-.unit {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
-}
-
-.unit .icon {
-  font-size: 1.3rem;
-}
-
-.unit .label {
-  font-size: 0.72rem;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
 }
 
 .unit.blue {

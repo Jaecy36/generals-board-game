@@ -13,7 +13,6 @@ const turnInfoEl = document.getElementById('turnInfo');
 const gameResultEl = document.getElementById('gameResult');
 const moveIndicatorEl = document.getElementById('moveIndicator');
 const setupStatusEl = document.getElementById('setupStatus');
-const battleRulesEl = document.getElementById('battleRules');
 const gameAreaEl = document.querySelector('.game-area');
 const joinBtn = document.getElementById('joinBtn');
 const roomIdInput = document.getElementById('roomId');
@@ -23,23 +22,22 @@ const setupControls = document.getElementById('setupControls');
 const HIDDEN_ICON = '?';
 const HIDDEN_LABEL = '?';
 
-const UNIT_ICON = {
-  general5: '5★',
-  general4: '4★',
-  general3: '3★',
-  general2: '2★',
-  general1: '1★',
-  colonel: 'COL',
-  lt_colonel: 'LtCol',
-  major: 'Maj',
-  captain: 'Capt',
-  lieutenant1: '1Lt',
-  lieutenant2: '2Lt',
-  sergeant: 'Sgt',
-  private: 'Pvt',
-  spy: 'Spy',
-  flag: '⚑',
-  unknown: HIDDEN_ICON
+const UNIT_IMAGES = {
+  general5: 'images/general5.png',
+  general4: 'images/general4.png',
+  general3: 'images/general3.png',
+  general2: 'images/general2.png',
+  general1: 'images/general1.png',
+  colonel: 'images/colonel.png',
+  lt_colonel: 'images/lt_colonel.png',
+  major: 'images/major.png',
+  captain: 'images/captain.png',
+  lieutenant1: 'images/lieutenant1.png',
+  lieutenant2: 'images/lieutenant2.png',
+  sergeant: 'images/sergeant.png',
+  private: 'images/private.png',
+  spy: 'images/spy.png',
+  flag: 'images/flag.png'
 };
 
 const UNIT_LABELS = {
@@ -86,7 +84,11 @@ function renderPieceTray(state) {
     card.className = `piece-card piece-${unit.type}`;
     if (selectedPieceId === unit.id) card.classList.add('selected');
     card.dataset.pieceId = unit.id;
-    card.innerHTML = `<span class="piece-icon">${UNIT_ICON[unit.type]}</span><span class="piece-label">${UNIT_LABELS[unit.type]}</span>`;
+    const imageSrc = UNIT_IMAGES[unit.type] || '';
+    card.innerHTML = `
+      <img class="piece-image" src="${imageSrc}" alt="${UNIT_LABELS[unit.type]}" onerror="this.style.display='none'" />
+      <span class="piece-label">${UNIT_LABELS[unit.type]}</span>
+    `;
     card.addEventListener('click', () => {
       selectedPieceId = unit.id;
       selectedCell = null;
@@ -155,11 +157,18 @@ function renderBoard(state) {
       cell.dataset.col = col;
       const unit = state.units.find((u) => u.pos && u.pos[0] === actualRow && u.pos[1] === col);
       if (unit) {
-        const icon = unit.hidden ? HIDDEN_ICON : UNIT_ICON[unit.type];
-        const label = unit.hidden ? HIDDEN_LABEL : UNIT_ICON[unit.type];
         const title = unit.hidden ? HIDDEN_LABEL : UNIT_LABELS[unit.type];
-        const unitHtml = `<div class="unit ${unit.hidden ? 'enemy' : unit.color}" title="${title}"><span class="icon">${icon}</span><span class="label">${label}</span></div>`;
-        cell.innerHTML = unitHtml;
+        if (unit.hidden) {
+          cell.innerHTML = `<div class="unit enemy" title="${title}"><span class="label">${HIDDEN_LABEL}</span></div>`;
+        } else {
+          const src = UNIT_IMAGES[unit.type] || '';
+          cell.innerHTML = `
+            <div class="unit ${unit.color}" title="${title}">
+              <img class="unit-image" src="${src}" alt="${title}" onerror="this.style.display='none'" />
+              <span class="label">${UNIT_LABELS[unit.type]}</span>
+            </div>
+          `;
+        }
       }
       cell.addEventListener('click', onCellClick);
       boardEl.appendChild(cell);
@@ -182,7 +191,6 @@ function updateInfo(state) {
 
   if (state.phase === 'setup') {
     setupControls.classList.remove('hidden');
-    battleRulesEl.classList.add('hidden');
     pieceTrayEl.classList.remove('hidden');
     const unplacedCount = state.units.filter((unit) => unit.color === localColor && !unit.pos).length;
     const myReady = state.setupReady ? state.setupReady[localColor] : false;
@@ -197,7 +205,6 @@ function updateInfo(state) {
     setupControls.classList.add('hidden');
     setupStatusEl.textContent = '';
     pieceTrayEl.classList.add('hidden');
-    battleRulesEl.classList.remove('hidden');
     selectedPieceId = null;
   }
 
