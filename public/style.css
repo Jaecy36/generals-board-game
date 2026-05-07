@@ -296,19 +296,10 @@ header p {
 
 .hidden-enemy {
   width: 100%;
-  max-width: 120px;
   min-height: 68px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 10px 12px;
   border-radius: 18px;
   background: linear-gradient(135deg, #b91c1c, #dc2626);
   box-shadow: 0 16px 32px rgba(185, 28, 28, 0.35);
-  color: #fee2e2;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.14em;
   transform: perspective(120px) rotateX(4deg);
 }
 
