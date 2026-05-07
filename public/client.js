@@ -167,7 +167,7 @@ function renderBoard(state) {
       if (unit) {
         const title = unit.hidden ? HIDDEN_LABEL : UNIT_LABELS[unit.type];
         if (unit.hidden) {
-          cell.innerHTML = `<div class="unit enemy" title="${title}"><span class="label">${HIDDEN_LABEL}</span></div>`;
+          cell.innerHTML = `<div class="unit enemy hidden-enemy" title="${title}"><span class="label">${HIDDEN_LABEL}</span></div>`;
         } else {
           const src = getUnitImage(unit.type);
           cell.innerHTML = `
