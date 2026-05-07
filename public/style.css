@@ -258,6 +258,14 @@ header p {
   background: rgba(255, 255, 255, 0.06);
 }
 
+.hidden-enemy {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #b91c1c, #dc2626);
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.12);
+}
+
 .unit {
   display: flex;
   flex-direction: column;

@@ -23,36 +23,36 @@ const HIDDEN_ICON = '?';
 const HIDDEN_LABEL = '?';
 
 const UNIT_IMAGES = {
-  general5: 'images/G5.svg',
-  general4: 'images/G4.svg',
-  general3: 'images/G3.svg',
-  general2: 'images/G2.svg',
-  general1: 'images/G1.svg',
-  colonel: 'images/CL.svg',
-  lt_colonel: 'images/LtCol.svg',
-  major: 'images/Major.svg',
-  captain: 'images/CAPT.svg',
-  lieutenant1: 'images/1LT.svg',
-  lieutenant2: 'images/2LT.svg',
-  sergeant: 'images/SGT.svg',
-  private: 'images/PRVT.svg',
-  spy: 'images/SPY.svg',
-  flag: 'images/FLAG.svg'
+  general5: 'images/G5.png',
+  general4: 'images/G4.png',
+  general3: 'images/G3.png',
+  general2: 'images/G2.png',
+  general1: 'images/G1.png',
+  colonel: 'images/CL.png',
+  lt_colonel: 'images/LtCol.png',
+  major: 'images/Major.png',
+  captain: 'images/CAPT.png',
+  lieutenant1: 'images/1LT.png',
+  lieutenant2: 'images/2LT.png',
+  sergeant: 'images/SGT.png',
+  private: 'images/PRVT.png',
+  spy: 'images/SPY.png',
+  flag: 'images/FLAG.png'
 };
 
 const UNIT_LABELS = {
-  general5: '5★ General',
-  general4: '4★ General',
-  general3: '3★ General',
-  general2: '2★ General',
-  general1: '1★ General',
-  colonel: 'Colonel',
-  lt_colonel: 'Lt. Colonel',
+  general5: '5★ Gen.',
+  general4: '4★ Gen.',
+  general3: '3★ Gen.',
+  general2: '2★ Gen.',
+  general1: '1★ Gen.',
+  colonel: 'Col.',
+  lt_colonel: 'Lt. Col.',
   major: 'Major',
   captain: 'Captain',
-  lieutenant1: '1st Lieutenant',
-  lieutenant2: '2nd Lieutenant',
-  sergeant: 'Sergeant',
+  lieutenant1: '1st Lt.',
+  lieutenant2: '2nd Lt.',
+  sergeant: 'Sarge',
   private: 'Private',
   spy: 'Spy',
   flag: 'Flag',
@@ -159,7 +159,7 @@ function renderBoard(state) {
       if (unit) {
         const title = unit.hidden ? HIDDEN_LABEL : UNIT_LABELS[unit.type];
         if (unit.hidden) {
-          cell.innerHTML = `<div class="unit enemy" title="${title}"><span class="label">${HIDDEN_LABEL}</span></div>`;
+          cell.innerHTML = `<div class="hidden-enemy" title="${title}"></div>`;
         } else {
           const src = UNIT_IMAGES[unit.type] || '';
           cell.innerHTML = `
