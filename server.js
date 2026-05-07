@@ -92,15 +92,12 @@ function canMove(unit, x, y, state) {
 }
 
 function calculateVisibleUnits(state, color) {
-  const ownUnits = state.units.filter((unit) => unit.color === color && unit.pos);
-  const visible = ownUnits.map((unit) => ({ ...unit, hidden: false }));
-  const isVisiblePosition = (x, y) => ownUnits.some((unit) => Math.abs(unit.pos[0] - x) + Math.abs(unit.pos[1] - y) <= 1);
-  state.units.forEach((unit) => {
-    if (unit.pos && unit.color !== color && isVisiblePosition(unit.pos[0], unit.pos[1])) {
-      visible.push({ ...unit, hidden: true, type: 'unknown' });
+  return state.units.map((unit) => {
+    if (unit.color === color) {
+      return { ...unit, hidden: false };
     }
+    return { ...unit, hidden: true };
   });
-  return visible;
 }
 
 function isOfficer(type) {
@@ -158,15 +155,11 @@ io.on('connection', (socket) => {
     const room = ROOMS[roomId];
     if (!room) return;
     room.players.forEach((player) => {
-      if (room.state.phase === 'setup') {
-        io.to(player.id).emit('stateUpdate', room.state);
-      } else {
-        const visibleState = {
-          ...room.state,
-          units: calculateVisibleUnits(room.state, player.color)
-        };
-        io.to(player.id).emit('stateUpdate', visibleState);
-      }
+      const visibleState = {
+        ...room.state,
+        units: calculateVisibleUnits(room.state, player.color)
+      };
+      io.to(player.id).emit('stateUpdate', visibleState);
     });
   }
 
