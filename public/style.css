@@ -251,17 +251,17 @@ header p {
 
 .piece-image,
 .unit-image {
-  width: 50px;
-  height: 50px;
+  width: 84px;
+  height: 54px;
   object-fit: contain;
-  border-radius: 12px;
+  border-radius: 14px;
   background: rgba(255, 255, 255, 0.06);
 }
 
 .hidden-enemy {
-  width: 42px;
-  height: 42px;
-  border-radius: 12px;
+  width: 84px;
+  height: 54px;
+  border-radius: 14px;
   background: linear-gradient(135deg, #b91c1c, #dc2626);
   box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.12);
 }
