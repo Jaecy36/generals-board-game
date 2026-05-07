@@ -117,7 +117,7 @@ header p {
 
 /* BOARD */
 .board-wrapper {
-  width: min(100%, 760px);
+  width: min(100%, 820px);
   background: rgba(14, 20, 32, 0.88);
   border: 1px solid rgba(148, 163, 184, 0.12);
   border-radius: 26px;
@@ -128,14 +128,14 @@ header p {
 
 .board {
   display: grid;
-  grid-template-columns: repeat(8, minmax(72px, 1fr));
+  grid-template-columns: repeat(8, minmax(84px, 1fr));
   grid-template-rows: repeat(8, minmax(72px, 1fr));
   gap: 10px;
 }
 
 .cell {
   width: 100%;
-  aspect-ratio: 1;
+  aspect-ratio: 1.16;
   display: grid;
   place-items: center;
   border-radius: 14px;
