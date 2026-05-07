@@ -20,42 +20,8 @@ const legendGrid = document.getElementById('legendGrid');
 const startGameBtn = document.getElementById('startGameBtn');
 const setupControls = document.getElementById('setupControls');
 
-const HIDDEN_ICON = '◼';
-const HIDDEN_LABEL = 'Enemy';
-const HIDDEN_TYPE_ICON = {
-  general5: 'G',
-  general4: 'G',
-  general3: 'G',
-  general2: 'G',
-  general1: 'G',
-  colonel: 'C',
-  lt_colonel: 'L',
-  major: 'M',
-  captain: 'C',
-  lieutenant1: 'Lt',
-  lieutenant2: 'Lt',
-  sergeant: 'S',
-  private: 'P',
-  spy: 'S',
-  flag: '⚑'
-};
-const HIDDEN_TYPE_LABELS = {
-  general5: 'General',
-  general4: 'General',
-  general3: 'General',
-  general2: 'General',
-  general1: 'General',
-  colonel: 'Colonel',
-  lt_colonel: 'Lt. Colonel',
-  major: 'Major',
-  captain: 'Captain',
-  lieutenant1: 'Lieutenant',
-  lieutenant2: 'Lieutenant',
-  sergeant: 'Sergeant',
-  private: 'Private',
-  spy: 'Spy',
-  flag: 'Flag'
-};
+const HIDDEN_ICON = '?';
+const HIDDEN_LABEL = '?';
 
 const UNIT_ICON = {
   general5: '5★',
@@ -64,7 +30,7 @@ const UNIT_ICON = {
   general2: '2★',
   general1: '1★',
   colonel: 'COL',
-  lt_colonel: 'LtC',
+  lt_colonel: 'LtCol',
   major: 'Maj',
   captain: 'Capt',
   lieutenant1: '1Lt',
@@ -202,9 +168,9 @@ function renderBoard(state) {
       cell.dataset.col = col;
       const unit = state.units.find((u) => u.pos && u.pos[0] === actualRow && u.pos[1] === col);
       if (unit) {
-        const icon = unit.hidden ? (HIDDEN_TYPE_ICON[unit.type] || HIDDEN_ICON) : UNIT_ICON[unit.type];
-        const label = unit.hidden ? (HIDDEN_TYPE_LABELS[unit.type] || HIDDEN_LABEL) : UNIT_ICON[unit.type];
-        const title = unit.hidden ? (HIDDEN_TYPE_LABELS[unit.type] || HIDDEN_LABEL) : UNIT_LABELS[unit.type];
+        const icon = unit.hidden ? HIDDEN_ICON : UNIT_ICON[unit.type];
+        const label = unit.hidden ? HIDDEN_LABEL : UNIT_ICON[unit.type];
+        const title = unit.hidden ? HIDDEN_LABEL : UNIT_LABELS[unit.type];
         const unitHtml = `<div class="unit ${unit.hidden ? 'enemy' : unit.color}" title="${title}"><span class="icon">${icon}</span><span class="label">${label}</span></div>`;
         cell.innerHTML = unitHtml;
       }
