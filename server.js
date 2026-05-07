@@ -92,11 +92,11 @@ function canMove(unit, x, y, state) {
 }
 
 function calculateVisibleUnits(state, color) {
-  const ownUnits = state.units.filter((unit) => unit.color === color);
+  const ownUnits = state.units.filter((unit) => unit.color === color && unit.pos);
   const visible = ownUnits.map((unit) => ({ ...unit, hidden: false }));
   const isVisiblePosition = (x, y) => ownUnits.some((unit) => Math.abs(unit.pos[0] - x) + Math.abs(unit.pos[1] - y) <= 1);
   state.units.forEach((unit) => {
-    if (unit.color !== color && isVisiblePosition(unit.pos[0], unit.pos[1])) {
+    if (unit.pos && unit.color !== color && isVisiblePosition(unit.pos[0], unit.pos[1])) {
       visible.push({ ...unit, hidden: true, type: 'unknown' });
     }
   });
