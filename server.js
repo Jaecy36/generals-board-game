@@ -7,7 +7,7 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3001;
 const TURN_ORDER = ['blue', 'red'];
 const MAX_PLAYERS = 2;
 const ROOMS = {}; // roomId -> { players: [], state }
@@ -158,11 +158,15 @@ io.on('connection', (socket) => {
     const room = ROOMS[roomId];
     if (!room) return;
     room.players.forEach((player) => {
-      const visibleState = {
-        ...room.state,
-        units: calculateVisibleUnits(room.state, player.color)
-      };
-      io.to(player.id).emit('stateUpdate', visibleState);
+      if (room.state.phase === 'setup') {
+        io.to(player.id).emit('stateUpdate', room.state);
+      } else {
+        const visibleState = {
+          ...room.state,
+          units: calculateVisibleUnits(room.state, player.color)
+        };
+        io.to(player.id).emit('stateUpdate', visibleState);
+      }
     });
   }
 
