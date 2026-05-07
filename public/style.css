@@ -101,6 +101,7 @@ header p {
   grid-template-columns: minmax(200px, 250px) 1fr minmax(280px, 320px);
   gap: 22px;
   align-items: flex-start;
+  justify-items: center;
 }
 
 .sidebar-left {
@@ -118,15 +119,25 @@ header p {
 /* BOARD */
 .board-wrapper {
   width: min(100%, 920px);
-  background: rgba(14, 20, 32, 0.88);
-  border: 1px solid rgba(148, 163, 184, 0.12);
-  border-radius: 26px;
-  padding: 18px;
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.02);
-  justify-self: center; /* centers the board */
+  background: rgba(14, 20, 32, 0.96);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 30px;
+  padding: 20px;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.05),
+    0 24px 60px rgba(0, 0, 0, 0.24);
+  justify-self: center;
+  margin: 0 auto;
+}
+
+.board-meta {
+  display: flex;
+  justify-content: center;
+  width: 100%;
 }
 
 .board {
+  margin: 0 auto;
   display: grid;
   grid-template-columns: repeat(8, minmax(108px, 1fr));
   grid-template-rows: repeat(8, minmax(74px, 1fr));
