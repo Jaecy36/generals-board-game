@@ -22,24 +22,30 @@ const setupControls = document.getElementById('setupControls');
 
 const HIDDEN_ICON = '?';
 const HIDDEN_LABEL = '?';
+const IMAGE_VERSION = '2';
 
 const UNIT_IMAGES = {
-  general5: 'images/G5.svg',
-  general4: 'images/G4.svg',
-  general3: 'images/G3.svg',
-  general2: 'images/G2.svg',
-  general1: 'images/G1.svg',
-  colonel: 'images/CL.svg',
-  lt_colonel: 'images/LtCol.svg',
-  major: 'images/Major.svg',
-  captain: 'images/CAPT.svg',
-  lieutenant1: 'images/1LT.svg',
-  lieutenant2: 'images/2LT.svg',
-  sergeant: 'images/SGT.svg',
-  private: 'images/PRVT.svg',
-  spy: 'images/SPY.svg',
-  flag: 'images/FLAG.svg'
+  general5: 'images/G5.png',
+  general4: 'images/G4.png',
+  general3: 'images/G3.png',
+  general2: 'images/G2.png',
+  general1: 'images/G1.png',
+  colonel: 'images/CL.png',
+  lt_colonel: 'images/LtCol.png',
+  major: 'images/Major.png',
+  captain: 'images/CAPT.png',
+  lieutenant1: 'images/1LT.png',
+  lieutenant2: 'images/2LT.png',
+  sergeant: 'images/SGT.png',
+  private: 'images/PRVT.png',
+  spy: 'images/SPY.png',
+  flag: 'images/FLAG.png'
 };
+
+function getUnitImage(type) {
+  const path = UNIT_IMAGES[type] || 'images/FLAG.png';
+  return `${path}?v=${IMAGE_VERSION}`;
+}
 
 const UNIT_LABELS = {
   general5: '5★ Gen.',
@@ -85,7 +91,7 @@ function renderPieceTray(state) {
     card.className = `piece-card piece-${unit.type}`;
     if (selectedPieceId === unit.id) card.classList.add('selected');
     card.dataset.pieceId = unit.id;
-    const imageSrc = UNIT_IMAGES[unit.type] || '';
+    const imageSrc = getUnitImage(unit.type);
     card.innerHTML = `
       <img class="piece-image" src="${imageSrc}" alt="${UNIT_LABELS[unit.type]}" onerror="this.style.display='none'" />
       <span class="piece-label">${UNIT_LABELS[unit.type]}</span>
@@ -163,7 +169,7 @@ function renderBoard(state) {
         if (unit.hidden) {
           cell.innerHTML = `<div class="unit enemy" title="${title}"><span class="label">${HIDDEN_LABEL}</span></div>`;
         } else {
-          const src = UNIT_IMAGES[unit.type] || '';
+          const src = getUnitImage(unit.type);
           cell.innerHTML = `
             <div class="unit ${unit.color}" title="${title}">
               <img class="unit-image" src="${src}" alt="${title}" onerror="this.style.display='none'" />

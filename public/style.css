@@ -135,7 +135,7 @@ header p {
 
 .cell {
   width: 100%;
-  aspect-ratio: 1.32;
+  aspect-ratio: 1.46;
   display: grid;
   place-items: center;
   border-radius: 14px;
